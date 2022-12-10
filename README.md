@@ -23,6 +23,7 @@ Building this project on the Mina Blockchain as part of the zk-ignite program ht
 
 ## Tasks
 - Figure out a way to use connect to metamask wallet within typescript code *(Blocker)*
+(Tutorial used: https://adeleyemahmud.com/2022/09/25/add-a-web3-connect-button-to-your-react-app-with-typescript-and-metamask/)
 - How to get list of holders for a particular NFT collection *(Blocker)*
 - How to retrieve the list holders in an Oracle on Mina (complete the tutorial on Mina https://docs.minaprotocol.com/zkapps/tutorials/oracle)
 - Create the smart contract that allows the user to submit their wallet address and prove that they own an NFT within that collection 
