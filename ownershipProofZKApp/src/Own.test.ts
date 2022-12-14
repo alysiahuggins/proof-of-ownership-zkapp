@@ -1,4 +1,4 @@
-import { Own } from './Own';
+import { Own, NFTHolder, createNFTHoldersMerkleTree, NFTHolderWitness } from './Own';
 import {
   isReady,
   shutdown,
@@ -7,6 +7,7 @@ import {
   PrivateKey,
   PublicKey,
   AccountUpdate,
+  CircuitString,
 } from 'snarkyjs';
 
 /*
@@ -29,16 +30,20 @@ describe('Own', () => {
   beforeAll(async () => {
     await isReady;
     if (proofsEnabled) Own.compile();
-  });
 
-  beforeEach(() => {
     const Local = Mina.LocalBlockchain({ proofsEnabled });
     Mina.setActiveInstance(Local);
     deployerAccount = Local.testAccounts[0].privateKey;
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
     zkApp = new Own(zkAppAddress);
+
+    console.log("deploying")
+    await localDeploy();
+    console.log("initializing")
+    await init();
   });
+
 
   afterAll(() => {
     // `shutdown()` internally calls `process.exit()` which will exit the running Jest process early.
@@ -67,15 +72,57 @@ describe('Own', () => {
     await initTx.send();
     console.log('Own init');
   }
+  
 
   it('generates and deploys the `Own` smart contract', async () => {
-    console.log("deploying")
-    await localDeploy();
-    console.log("initializing")
-    await init();
+    
     const commitment = zkApp.commitmentNFTHolders.get();
     console.log(commitment.toString())
     expect(commitment).toEqual(Field("19500543247797079170250155519623097781256876506498328163677247554333433174572"));
+  });
+
+  it('validate the first item in the merkle tree in the `Own` smart contract', async () => {
+    const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(0));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+            zkApp.validateNFTHolder(new NFTHolder(CircuitString.fromString("0x00bd58530a64b04f552f2f6a8319e91d70f6b12b")),  witness);
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for question ${0}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
+    
+    expect(result).toEqual(true);
+  });
+
+  it('validate the wrong address is not in the merkle tree in the `Own` smart contract', async () => {
+    const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(0));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+            zkApp.validateNFTHolder(new NFTHolder(CircuitString.fromString("0x00bd1234a64b04f552f2f6a8319e91d70f6b12b")),  witness);
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for question ${0}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
+    
+    expect(result).toEqual(false);
   });
 
 //   it('correctly updates the num state on the `Add` smart contract', async () => {
