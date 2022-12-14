@@ -92,7 +92,7 @@ describe('Own', () => {
             zkApp.sign(zkAppPrivateKey);
     
         });
-        console.log(`Sending blockchain transaction for question ${0}`)
+        console.log(`Sending blockchain transaction for address ${0}`)
         await txn.send();
         result = true;
 
@@ -103,39 +103,118 @@ describe('Own', () => {
     expect(result).toEqual(true);
   });
 
-  it('validate the wrong address is not in the merkle tree in the `Own` smart contract', async () => {
+  it('validate the 1st address in the merkle tree in the `Own` smart contract', async () => {
     const merkleTree = createNFTHoldersMerkleTree();
     let w = merkleTree.getWitness(BigInt(0));
     let witness = new NFTHolderWitness(w);
     let result = false;
     try{
         let txn = await Mina.transaction(deployerAccount, () => {
-            zkApp.validateNFTHolder(new NFTHolder(CircuitString.fromString("0x00bd1234a64b04f552f2f6a8319e91d70f6b12b")),  witness);
+            zkApp.validateNFTHolder(new NFTHolder(CircuitString.fromString("0x00bd58530a64b04f552f2f6a8319e91d70f6b12b")),  witness);
             zkApp.sign(zkAppPrivateKey);
     
         });
-        console.log(`Sending blockchain transaction for question ${0}`)
+        console.log(`Sending blockchain transaction for address ${0}`)
         await txn.send();
         result = true;
 
     }catch(e){
         result = false;
     }
+    expect(result).toEqual(true);
+  });
+
+  it('validate the 3rd address is in the merkle tree in the `Own` smart contract', async () => {
+    const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(2));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+            zkApp.validateNFTHolder(new NFTHolder(CircuitString.fromString("0x01cd1418b4ccad800239cdd0e6fe1b9dc93be09d")),  witness);
+            zkApp.sign(zkAppPrivateKey);
     
+        });
+        console.log(`Sending blockchain transaction for address ${2}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
+    expect(result).toEqual(true);
+  });
+
+  it('validate the wrong address is not in the merkle tree in the `Own` smart contract', async () => {
+    const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(2));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+            zkApp.validateNFTHolder(new NFTHolder(CircuitString.fromString("0x1234518b4ccad800239cdd0e6fe1b9dc93be09d")),  witness);
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for address ${2}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
     expect(result).toEqual(false);
   });
 
-//   it('correctly updates the num state on the `Add` smart contract', async () => {
-//     await localDeploy();
+  it('validate the 1st address & add to validatedMerkleTree in the `Own` smart contract', async () => {
+    const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(0));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
 
-//     // update transaction
-//     const txn = await Mina.transaction(deployerAccount, () => {
-//       zkApp.update();
-//     });
-//     await txn.prove();
-//     await txn.send();
+            zkApp.validateAndStoreNFTHolder(new NFTHolder(CircuitString.fromString("0x00bd58530a64b04f552f2f6a8319e91d70f6b12b")),  
+            witness, (new NFTHolder(CircuitString.fromString("0x00bd58530a64b04f552f2f6a8319e91d70f6b12b"))));
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for address ${0}`)
+        await txn.send();
+        result = true;
 
-//     const updatedNum = zkApp.num.get();
-//     expect(updatedNum).toEqual(Field(3));
-//   });
+    }catch(e){
+        result = false;
+    }
+
+    let numValidated = zkApp.validatedNFTHoldersTotal.get();
+    result = result && (numValidated.toBigInt().toString()=="1")!;
+    expect(result).toEqual(true);
+  });
+
+  it('validate that already validated address is in the validated Holders Merkle Tree in the `Own` smart contract', async () => {
+    const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(0));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+
+            zkApp.verifyAlreadyValidated(new NFTHolder(CircuitString.fromString("0x00bd58530a64b04f552f2f6a8319e91d70f6b12b")),  
+            witness);
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for address ${0}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
+
+    expect(result).toEqual(true);
+  });
+
+
 });
