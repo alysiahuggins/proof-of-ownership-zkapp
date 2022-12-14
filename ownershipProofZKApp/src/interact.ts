@@ -14,7 +14,7 @@
  */
 import { Mina, PrivateKey, shutdown } from 'snarkyjs';
 import fs from 'fs/promises';
-import { Add } from './Add.js';
+import { Own } from './Own.js';
 
 // check command line arg
 let network = process.argv[2];
@@ -42,28 +42,28 @@ let zkAppKey = PrivateKey.fromBase58(key.privateKey);
 const Network = Mina.Network(config.url);
 Mina.setActiveInstance(Network);
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Add(zkAppAddress);
+let zkApp = new Own(zkAppAddress);
 
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await Add.compile();
+await Own.compile();
 
-// call update() and send transaction
-console.log('build transaction and create proof...');
-let tx = await Mina.transaction({ feePayerKey: zkAppKey, fee: 0.1e9 }, () => {
-  zkApp.update();
-});
-await tx.prove();
-console.log('send transaction...');
-let sentTx = await tx.send();
+// // call update() and send transaction
+// console.log('build transaction and create proof...');
+// let tx = await Mina.transaction({ feePayerKey: zkAppKey, fee: 0.1e9 }, () => {
+//   zkApp.update();
+// });
+// await tx.prove();
+// console.log('send transaction...');
+// let sentTx = await tx.send();
 
-if (sentTx.hash() !== undefined) {
-  console.log(`
-Success! Update transaction sent.
+// if (sentTx.hash() !== undefined) {
+//   console.log(`
+// Success! Update transaction sent.
 
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
-`);
-}
+// Your smart contract state will be updated
+// as soon as the transaction is included in a block:
+// https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
+// `);
+// }
 shutdown();
