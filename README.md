@@ -43,13 +43,16 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
 - Store email addresses within my zkapp (may use merkle trees)
 - Complete the offchain storage tutorial  https://docs.minaprotocol.com/zkapps/tutorials/offchain-storage
 - Proving Ownership
-    - Create a zkApp that checks to see whether the address supplied is in a list of addresses (using merkle trees + zk smart contract)
+    - Create a zkApp that checks to see whether the address supplied is in a list of addresses (using merkle trees + zk smart contract) (DONE)
         - If it is, store the user Mina address as an allowed voter in offchain storage (using merkle trees + zk Smart contract (same smart contract as above))
 - Performing Actions
     - Check to see if Mina address is in allowed voters (get data from offchain merkle tree + zk Smart Contract)
         - Allow user to vote annonymously & tally votes (how do you get the info from that position in the merkle tree? - try the merkle tree example and see if you can figure it out)
 - Create a Front-end that allows the user to
     - Prove Ownership
+        - connect to ETH button
+        - connect to Mina Button
+        - sign in with ETH Account Button
     - Submit an email address associated with their account
     - Update an email address associated with their account
     - Show authenticated users the information they are seeking

@@ -5,6 +5,7 @@ import { Container, Row, Col, Button, Card, Form, Spinner, InputGroup, ListGroup
 // import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/css/bootstrap.css';
 
+
 import ConfettiExplosion from 'react-confetti-explosion';
 
 import ZkappWorkerClient from './zkappWorkerClient';
@@ -534,14 +535,113 @@ let claimContent =
       </Container>;
   }
 
+  const [isMetamaskInstalled, setIsMetamaskInstalled] = useState<boolean>(false);
+  const [isAuroInstalled, setIsAuroInstalled] = useState<boolean>(false);
+
+  const [ETHAccount, setETHAccount] = useState<string | null>(null);
+  const [MinaAccount, setMinaAccount] = useState<string | null>(null);
+
+  let ETHWalletButton, MinaWalletButton;
+
+  useEffect(() => {
+    if((window as any).ethereum){
+      //check if Metamask wallet is installed
+      setIsMetamaskInstalled(true);
+    }
+  },[]);
+
+  useEffect(() => {
+    if((window as any).mina){
+      //check if Metamask wallet is installed
+      setIsAuroInstalled(true);
+    }
+  },[]);
+
+
+  async function connectETHWallet(): Promise<void> {
+    //to get around type checking
+    (window as any).ethereum
+      .request({
+          method: "eth_requestAccounts",
+      })
+      .then((accounts : string[]) => {
+        setETHAccount(accounts[0]);
+      })
+      .catch((error: any) => {
+          alert(`Something went wrong: ${error}`);
+      });
+  }
+
+  async function connectMinaWallet(): Promise<void>{
+    const mina = (window as any).mina;
+
+    if (mina == null) {
+      setState({ ...state, hasWallet: false });
+      return;
+    }
+
+    const publicKeyBase58 : string = (await mina.requestAccounts())[0];
+    const publicKey = PublicKey.fromBase58(publicKeyBase58);
+    setMinaAccount(publicKeyBase58);
+  }
+
+  ETHWalletButton = (ETHAccount === null)?
+      <div className="text-center">
+        {
+          isMetamaskInstalled ? (
+            <div>
+              {/* <img src={logo} className="App-logo" alt="logo" /> */}
+              <Button onClick={connectETHWallet}>Connect Your Metamask Wallet</Button>
+            </div>
+          ) : (
+            <p>Install Your Metamask wallet</p>
+          )
+        }
+      </div>:
+    <div className="text-center">
+      <header className="App-header">
+        {/* <img  className="App-logo" alt="logo" /> */}
+        <p>
+          ETH wallet connected as: {ETHAccount}
+        </p>
+      </header>
+    </div>
+
+  MinaWalletButton = (MinaAccount === null)?
+    <div className="text-center">
+      {
+        isAuroInstalled ? (
+          <div>
+            {/* <img src={logo} className="App-logo" alt="logo" /> */}
+            <Button onClick={connectMinaWallet}>Connect Your Auro Wallet</Button>
+          </div>
+        ) : (
+          <p>Install Your Auro wallet</p>
+        )
+      }
+    </div>:
+    <div className="text-center">
+    <header className="App-header">
+      {/* <img  className="App-logo" alt="logo" /> */}
+      <p>
+        Mina wallet connected as: {MinaAccount}
+      </p>
+    </header>
+    </div>
+
+
   
 
 
 
   return <div>
+    { ETHWalletButton }
+    { MinaWalletButton }
+
    { logoContent }
    { setup }
    { accountDoesNotExist }
+   
    {/* { mainContent } */}
    {/* { quizContent } */}
    {confettiContent}
