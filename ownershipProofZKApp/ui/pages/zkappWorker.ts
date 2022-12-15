@@ -21,9 +21,9 @@ type Transaction = Awaited<ReturnType<typeof Mina.transaction>>;
 
 // ---------------------------------------------------------------------------------------
 
-import type { Own } from '../../../build/src/Own.js';
+import type { Own } from '../../build/src/Own.js';
 // import  { createNFTHoldersMerkleTree, NFTHolderWitness, NFTHolder } from '../../../build/src/Own.js';
-import { nft_holders } from '../../../nft_holders/nft_holders.js';
+import { nft_holders } from '../../nft_holders/nft_holders.js';
 
 // import { MyMerkleWitness } from '../../contracts/src/Classes';
 
@@ -103,7 +103,7 @@ const functions = {
 
   },
   loadContract: async (args: {}) => {
-    const { Own } = await import('../../../build/src/Own.js');
+    const { Own } = await import('../../build/src/Own.js');
     state.Own = Own;
     state.zkapp = new state.Own!(state.zkappPublicKey!);
 
@@ -166,6 +166,33 @@ const functions = {
         }
       );
       state.transaction = transaction;
+      return true;
+    }catch(e){ 
+      console.log("error from create tx")
+      console.log(e)
+      return false;
+    }
+  },
+
+  sendValidateNFTHolderTransactionLocal: async (args: {response: string, holderPosition: string}) => {
+    try{
+      console.log(args.response);
+      console.log(args.holderPosition);
+      let w = state.nftHoldersTree!.getWitness(BigInt(args.holderPosition));
+      let witness = new NFTHolderWitness(w);
+      const transaction = await Mina.transaction(state.deployerAccount!, () => {
+           state.zkapp!.validateNFTHolder(new NFTHolder(CircuitString.fromString((args.response))), witness);
+            state.zkapp!.sign(state.zkappPrivateKey!);
+          }
+      );
+
+      
+
+      state.transaction = transaction;
+      
+      state.transaction!.prove();
+      state.transaction!.send();
+      console.log('successfully')
       return true;
     }catch(e){ 
       console.log("error from create tx")

@@ -50,9 +50,11 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
         - Allow user to vote annonymously & tally votes (how do you get the info from that position in the merkle tree? - try the merkle tree example and see if you can figure it out)
 - Create a Front-end that allows the user to
     - Prove Ownership
-        - connect to ETH button
-        - connect to Mina Button
-        - sign in with ETH Account Button
+        - connect to ETH button (Done)
+        - connect to Mina Button (Done)
+        - one button to connect wallets
+        - allow switch Account with Metamask
+    - Connect Frontend to Berkeley
     - Submit an email address associated with their account
     - Update an email address associated with their account
     - Show authenticated users the information they are seeking
@@ -101,6 +103,13 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
     - You don't leak which application you want to authenticate with to anyone else
     - You could use this portable proof system on "any website" - maybe bring thr focus to the tech as a passport rather than the single app of a patreon clone
 
+
+## Deployment Details
+Address = B62qmJHgz9hq2Jxsz7DLXUCN3j7sioJb2BLoknqzLb4iyBSknPAJFsW
+Deployment transaction = https://berkeley.minaexplorer.com/transaction/Ckpa7VhZLcUeuKpAEDAqGpd1nEgMzHbtKhiVvZ9PaoqHYAENzcvYD
+
+## Run Berkeley Tester locally
+`npm run build && node build/src/mainYKBerkeley.js berkeley `
 
 ## Thank You's
 *Thank you to 45930 on discord and JenPaff for help me talk through the idea and discuss the technical challenges over the weekend* 

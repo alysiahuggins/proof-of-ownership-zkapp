@@ -252,6 +252,67 @@ export default function App() {
 
   // }
 
+  // -------------------------------------------------------
+  // Validate Holder
+
+  const onValidateHolder = async () => {
+    try{
+      setState({ ...state, creatingTransaction: true });
+      setLoadTxnClass('d-block');
+      console.log('sending a transaction...');
+
+      // await state.zkappWorkerClient!.fetchAccount({ publicKey: state.publicKey! });
+
+      let txCreated = await state.zkappWorkerClient!.sendValidateNFTHolderTransactionLocal(ETHAccount!, "161");
+      if(txCreated){
+        console.log('transaction created...');
+        // await state.zkappWorkerClient!.proveUpdateTransaction();
+
+        // console.log('getting Transaction JSON...');
+        // const transactionJSON = await state.zkappWorkerClient!.getTransactionJSON()
+        // console.log(transactionJSON);
+        // console.log('requesting send transaction...');
+        // const { hash } = await (window as any).mina.sendTransaction({
+        //   transaction: transactionJSON,
+        //   feePayer: {
+        //     fee: transactionFee,
+        //     memo: '',
+        //   },
+        // });
+
+        // console.log(
+        //   'See transaction at https://berkeley.minaexplorer.com/transaction/' + hash
+        // );
+        // txns.push('https://berkeley.minaexplorer.com/transaction/' + hash);
+        // setState({ ...state, creatingTransaction: false });
+        // setLoadTxnClass('d-none');
+        // setClaimViewClass('d-none');
+
+        return true;
+
+      }else{
+        setState({ ...state, creatingTransaction: false });
+        setLoadTxnClass('d-none');
+        setClaimViewClass('d-none');
+
+        return false;
+    }
+      
+      
+    }catch(e){
+      setState({ ...state, creatingTransaction: false });
+      setClaimViewClass('d-none');
+      setLoadTxnClass('d-none');
+
+      console.log("error caught")
+      console.log(e)
+      return false
+    }
+
+    
+  }
+
+
   
   // -------------------------------------------------------
   // Refresh the current state
@@ -426,7 +487,7 @@ let claimContent =
   //   </Container>
   // }
 
-  let mainContent, quizContent, transactionContent;
+  let mainContent, validateContent, transactionContent;
   if (state.hasBeenSetup ) {
 
   // if (state.hasBeenSetup && state.accountExists) {
@@ -516,6 +577,16 @@ let claimContent =
     //       </Col>
     //     </Row>
     //   </Container>;
+
+    validateContent = 
+    <Container fluid="sm" className="text-center">
+    <Row>
+      <Col></Col>
+      <Col>
+        <Button onClick={onValidateHolder} /*disabled={state.creatingTransaction}*/> Verify </Button>
+      </Col>
+    </Row>
+    </Container>;
 
       transactionContent = 
       
@@ -643,7 +714,7 @@ let claimContent =
    { accountDoesNotExist }
    
    {/* { mainContent } */}
-   {/* { quizContent } */}
+   { validateContent }
    {confettiContent}
    {claimContent}
    {loadingSpinner}

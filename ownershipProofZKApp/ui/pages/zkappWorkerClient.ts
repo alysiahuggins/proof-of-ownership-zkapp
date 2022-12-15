@@ -56,6 +56,9 @@ export default class ZkappWorkerClient {
   async createValidateNFTHolderTransaction(response: string, holderPosition: string) {
     return await this._call('createValidateNFTHolderTransaction', {response: response, holderPosition: holderPosition});
   }
+  async sendValidateNFTHolderTransactionLocal(response: string, holderPosition: string) {
+    return await this._call('sendValidateNFTHolderTransactionLocal', {response: response, holderPosition: holderPosition});
+  }
 
   proveUpdateTransaction() {
     return this._call('proveUpdateTransaction', {});
