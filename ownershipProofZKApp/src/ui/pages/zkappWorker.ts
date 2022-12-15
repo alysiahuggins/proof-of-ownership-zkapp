@@ -101,10 +101,6 @@ const functions = {
     state.zkappPrivateKey = PrivateKey.random();
     state.zkappPublicKey = state.zkappPrivateKey.toPublicKey();
 
-    console.log("local instance set")
-
-
-
   },
   loadContract: async (args: {}) => {
     const { Own } = await import('../../../build/src/Own.js');
