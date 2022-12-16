@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import ConfettiExplosion from 'react-confetti-explosion';
 
 import ZkappWorkerClient from './zkappWorkerClient';
+import * as ls from "local-storage";
 
 import {
   PublicKey,
@@ -19,7 +20,7 @@ import {
 // import {questionsRadio as questionsRadio} from "../../../quiz-app/src/curriculum/curriculum.js";
 // import {answers as answers} from "../../../quiz-app/src/curriculum/curriculum.js";
 let index = 0;
-
+let validatedAddresses: string[] = [];
 
 let transactionFee = 0.1;
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
     creatingTransaction: false,
     claimRewardsDisabled: true,
     walletConnected: false,
+    validatedAddresses: null as null | string [],
   });
 
   // -------------------------------------------------------
@@ -43,6 +45,9 @@ export default function App() {
   useEffect(() => {
     (async () => {
       if (!state.hasBeenSetup) {
+        validatedAddresses = ls.get('validatedAddresses');
+        console.log(`validatedAddresses`)
+        console.log(validatedAddresses);
         const zkappWorkerClient = new ZkappWorkerClient();
         
         console.log('Loading SnarkyJS...');
@@ -84,7 +89,7 @@ export default function App() {
         
         console.log('getting zkApp state...');
         await zkappWorkerClient.fetchAccount({ publicKey: zkappPublicKey })
-        const currentNum = await zkappWorkerClient.getNum();
+        const currentNum = await zkappWorkerClient.getCommitmentNFTHolders();
         console.log('current state:', currentNum.toString());
 
         setState({ 
@@ -95,7 +100,8 @@ export default function App() {
             // publicKey, 
             zkappPublicKey: zkappPublicKey, 
             // accountExists, 
-            currentNum: currentNum
+            currentNum: currentNum,
+            validatedAddresses: validatedAddresses
         });
       }
     })();
@@ -312,6 +318,99 @@ export default function App() {
     
   }
 
+  // -------------------------------------------------------
+  // Sign Up Holder
+
+  const onSignUp = async () => {
+    try{
+      setState({ ...state, creatingTransaction: true });
+      setLoadTxnClass('d-block');
+      console.log('sending a transaction...');
+
+      // await state.zkappWorkerClient!.fetchAccount({ publicKey: state.publicKey! });
+
+      let txCreated = await state.zkappWorkerClient!.createValidateAndStoreNFTHolderTransaction(
+        ETHAccount!, 
+        "161",
+        state.publicKey!.toBase58()
+      );
+      if(txCreated){
+        console.log('transaction created...now to prove it');
+        await state.zkappWorkerClient!.proveUpdateTransaction();
+
+        console.log('getting Transaction JSON...');
+        const transactionJSON = await state.zkappWorkerClient!.getTransactionJSON()
+        console.log(transactionJSON);
+        console.log('requesting send transaction...');
+        const { hash } = await (window as any).mina.sendTransaction({
+          transaction: transactionJSON,
+          feePayer: {
+            fee: transactionFee,
+            memo: '',
+          },
+        });
+
+        console.log(
+          'See transaction at https://berkeley.minaexplorer.com/transaction/' + hash
+        );
+        txns.push('https://berkeley.minaexplorer.com/transaction/' + hash);
+        setState({ ...state, creatingTransaction: false });
+        setLoadTxnClass('d-none');
+        setClaimViewClass('d-none');
+
+        //TODO if tx successful, store validated holders locally
+        console.log(`state.publicKey!`);
+        console.log(state.publicKey!);
+        if(validatedAddresses!=null) validatedAddresses.push(MinaAccount!);
+        else validatedAddresses = [MinaAccount!]
+        setState({ 
+          ...state, 
+          validatedAddresses: validatedAddresses
+        });
+        console.log("validated Addresses");
+        console.log(state.validatedAddresses!);
+        ls.set('validatedAddresses', validatedAddresses);
+        let initialState = await state.zkappWorkerClient!.getNumValidatedNFTHolders();
+        let appState = initialState;
+        console.log(`initial State`);
+        console.log(initialState);
+        let stateChanged = false;
+        while (!stateChanged) {
+          console.log(
+            'waiting for zkApp state to change... (current state: ',
+            appState.toString() + ')'
+          );
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          await state.zkappWorkerClient!.fetchAccount({ publicKey: state.zkappPublicKey! });
+          appState = await state.zkappWorkerClient!.getNumValidatedNFTHolders();
+          stateChanged = !initialState.equals(appState).toBoolean();
+        }
+        console.log(`Num validated holders changed from ${initialState} to ${appState}`);
+        ls.set('numValidatedAddress', appState);
+        return true;
+
+      }else{
+        setState({ ...state, creatingTransaction: false });
+        setLoadTxnClass('d-none');
+        setClaimViewClass('d-none');
+
+        return false;
+    }
+      
+      
+    }catch(e){
+      setState({ ...state, creatingTransaction: false });
+      setClaimViewClass('d-none');
+      setLoadTxnClass('d-none');
+
+      console.log("error caught")
+      console.log(e)
+      return false
+    }
+
+    
+  }
+
 
   
   // -------------------------------------------------------
@@ -320,7 +419,7 @@ export default function App() {
   const onRefreshCurrentNum = async () => {
     console.log('getting zkApp state...');
     await state.zkappWorkerClient!.fetchAccount({ publicKey: state.zkappPublicKey! })
-    const currentNum = await state.zkappWorkerClient!.getNum();
+    const currentNum = await state.zkappWorkerClient!.getCommitmentNFTHolders();
     console.log('current state:', currentNum.toString());
 
     setState({ ...state, currentNum });
@@ -581,9 +680,14 @@ let claimContent =
     validateContent = 
     <Container fluid="sm" className="text-center">
     <Row>
-      <Col></Col>
       <Col>
-        <Button onClick={onValidateHolder} /*disabled={state.creatingTransaction}*/> Verify </Button>
+        <Button onClick={onValidateHolder} disabled={state.creatingTransaction}> Verify </Button>
+      </Col>
+    </Row>
+    <br></br>
+    <Row>
+      <Col>
+        <Button onClick={onSignUp} disabled={state.creatingTransaction}> Sign Up </Button>
       </Col>
     </Row>
     </Container>;
@@ -668,6 +772,46 @@ let claimContent =
     });
   }
 
+  // async function connectMinaWallet(): Promise<void>{
+  //   const mina = (window as any).mina;
+
+  //   if (mina == null) {
+  //     setState({ ...state, hasWallet: false });
+  //     return;
+  //   }
+
+  //   const publicKeyBase58 : string = (await mina.requestAccounts())[0];
+  //   const publicKey = PublicKey.fromBase58(publicKeyBase58);
+  //   console.log(`public key`);
+  //   console.log(publicKey);
+
+  //   const walletConnected = true;
+
+    
+
+  //   setState({ 
+  //     ...state, 
+  //     publicKey: publicKey, 
+  //     walletConnected: walletConnected,
+  //   });
+  //   console.log('state public key');
+  //   console.log(state.publicKey!);
+
+  //   setMinaAccount(publicKeyBase58);
+
+  //   console.log('checking if account exists...');
+  //   const res = await state.zkappWorkerClient!.fetchAccount({ 
+  //     publicKey: PublicKey.fromBase58(MinaAccount!) 
+  //   });
+  //   const accountExists = res.error == null;
+
+  //   setState({ 
+  //     ...state, 
+  //     accountExists: accountExists
+  //   });
+
+  // }
+
   ETHWalletButton = (ETHAccount === null)?
       <div className="text-center">
         {
@@ -718,7 +862,9 @@ let claimContent =
 
 
   return <div>
+    <br></br>
     { ETHWalletButton }
+    <br></br>
     { MinaWalletButton }
 
    { logoContent }

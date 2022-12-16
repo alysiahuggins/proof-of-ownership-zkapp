@@ -158,7 +158,7 @@ const functions = {
     nftHoldersTree = createNFTHoldersMerkleTree();
     state.nftHoldersTree = nftHoldersTree;
   },
-  getNum: async (args: {}) => {
+  getCommitmentNFTHolders: async (args: {}) => {
     const currentNum = await state.zkapp!.commitmentNFTHolders.get();
     return JSON.stringify(currentNum);
   },
@@ -170,6 +170,28 @@ const functions = {
       let witness = new NFTHolderWitness(w);
       const transaction = await Mina.transaction(() => {
           state.zkapp!.validateNFTHolder(new NFTHolder(CircuitString.fromString((args.response))), witness);
+        }
+      );
+      state.transaction = transaction;
+      return true;
+    }catch(e){ 
+      console.log("error from create tx")
+      console.log(e)
+      return false;
+    }
+  },
+  createValidateAndStoreNFTHolderTransaction: async (args: {response: string, holderPosition: string, minaAddress: string}) => {
+    try{
+      console.log(args.response);
+      console.log(args.holderPosition);
+      console.log(args.minaAddress);
+      let w = state.nftHoldersTree!.getWitness(BigInt(args.holderPosition));
+      let witness = new NFTHolderWitness(w);
+      let minaHolder = new NFTHolder(CircuitString.fromString(args.minaAddress));
+      const transaction = await Mina.transaction(() => {
+          state.zkapp!.validateAndStoreNFTHolder(new NFTHolder(CircuitString.fromString((args.response))),
+          witness,
+          minaHolder);
         }
       );
       state.transaction = transaction;
@@ -220,7 +242,11 @@ const functions = {
   },
   getTransactionJSON: async (args: {}) => {
     return state.transaction!.toJSON();
-  }
+  },
+  getNumValidatedNFTHolders: async (args: {}) => {
+    const currentNum = await state.zkapp!.validatedNFTHoldersTotal.get();
+    return JSON.stringify(currentNum);
+  },
   
   
 };

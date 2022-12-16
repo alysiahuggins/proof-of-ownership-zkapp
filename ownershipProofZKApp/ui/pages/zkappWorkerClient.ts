@@ -48,14 +48,19 @@ export default class ZkappWorkerClient {
     return this._call('initZkappInstance', { publicKey58: publicKey.toBase58() });
   }
 
-  async getNum(): Promise<Field> {
-    const result = await this._call('getNum', {});
+  async getCommitmentNFTHolders(): Promise<Field> {
+    const result = await this._call('getCommitmentNFTHolders', {});
     return Field.fromJSON(JSON.parse(result as string));
   }
 
   async createValidateNFTHolderTransaction(response: string, holderPosition: string) {
     return await this._call('createValidateNFTHolderTransaction', {response: response, holderPosition: holderPosition});
   }
+
+  async createValidateAndStoreNFTHolderTransaction(response: string, holderPosition: string, minaAddress: string) {
+    return await this._call('createValidateAndStoreNFTHolderTransaction', {response: response, holderPosition: holderPosition, minaAddress: minaAddress});
+  }
+
   async sendValidateNFTHolderTransactionLocal(response: string, holderPosition: string) {
     return await this._call('sendValidateNFTHolderTransactionLocal', {response: response, holderPosition: holderPosition});
   }
@@ -67,6 +72,11 @@ export default class ZkappWorkerClient {
   async getTransactionJSON() {
     const result = await this._call('getTransactionJSON', {});
     return result;
+  }
+
+  async getNumValidatedNFTHolders(): Promise<Field> {
+    const result = await this._call('getNumValidatedNFTHolders', {});
+    return Field.fromJSON(JSON.parse(result as string));
   }
 
   
