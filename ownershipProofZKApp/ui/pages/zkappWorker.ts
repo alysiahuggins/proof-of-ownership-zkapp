@@ -146,19 +146,26 @@ const functions = {
   
   fetchAccount: async (args: { publicKey58: string }) => {
     const publicKey = PublicKey.fromBase58(args.publicKey58);
-    return await fetchAccount({ publicKey });
+    const account = await fetchAccount({ publicKey });
+    return account;
   },
-  // initZkappInstance: async (args: { publicKey58: string }) => {
-  //   const publicKey = PublicKey.fromBase58(args.publicKey58);
-  //   state.zkapp = new state.Own!(publicKey);
-  //   state.zkappPublicKey = publicKey;
-  // },
+  initZkappInstance: async (args: { publicKey58: string }) => {
+    const publicKey = PublicKey.fromBase58(args.publicKey58);
+    state.zkapp = new state.Own!(publicKey);
+    state.zkappPublicKey = publicKey;
+
+    let nftHoldersTree = new MerkleTree(10);
+    nftHoldersTree = createNFTHoldersMerkleTree();
+    state.nftHoldersTree = nftHoldersTree;
+  },
   getNum: async (args: {}) => {
     const currentNum = await state.zkapp!.commitmentNFTHolders.get();
     return JSON.stringify(currentNum);
   },
   createValidateNFTHolderTransaction: async (args: {response: string, holderPosition: string}) => {
     try{
+      console.log(args.response);
+      console.log(args.holderPosition);
       let w = state.nftHoldersTree!.getWitness(BigInt(args.holderPosition));
       let witness = new NFTHolderWitness(w);
       const transaction = await Mina.transaction(() => {
@@ -213,7 +220,17 @@ const functions = {
   },
   getTransactionJSON: async (args: {}) => {
     return state.transaction!.toJSON();
-  }
+  },
+  signTransaction: async (args: {privateKey: PrivateKey}) => {
+    try{
+      await state.transaction!.sign(privateKey);
+      return true;
+    }catch(e){
+      console.log("error from proof")
+      console.log(e)
+      return false;
+    }
+  },
   
   
 };

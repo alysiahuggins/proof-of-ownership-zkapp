@@ -44,9 +44,9 @@ export default class ZkappWorkerClient {
     return (result as ReturnType<typeof fetchAccount>);
   }
 
-  // initZkappInstance(publicKey: PublicKey) {
-  //   return this._call('initZkappInstance', { publicKey58: publicKey.toBase58() });
-  // }
+  initZkappInstance(publicKey: PublicKey) {
+    return this._call('initZkappInstance', { publicKey58: publicKey.toBase58() });
+  }
 
   async getNum(): Promise<Field> {
     const result = await this._call('getNum', {});

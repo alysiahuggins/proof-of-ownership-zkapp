@@ -28,12 +28,13 @@ export default function App() {
     zkappWorkerClient: null as null | ZkappWorkerClient,
     hasWallet: null as null | boolean,
     hasBeenSetup: false,
-    // accountExists: false,
+    accountExists: false,
     currentNum: null as null | Field,
-    // publicKey: null as null | PublicKey,
+    publicKey: null as null | PublicKey,
     zkappPublicKey: null as null | PublicKey,
     creatingTransaction: false,
     claimRewardsDisabled: true,
+    walletConnected: false,
   });
 
   // -------------------------------------------------------
@@ -46,17 +47,21 @@ export default function App() {
         
         console.log('Loading SnarkyJS...');
         await zkappWorkerClient.loadSnarkyJS();
+        setState({ ...state, zkappWorkerClient: zkappWorkerClient });
+
         console.log('done');
 
-        // await zkappWorkerClient.setActiveInstanceToBerkeley();
-        await zkappWorkerClient.setActiveInstanceToLocal();
+        await zkappWorkerClient.setActiveInstanceToBerkeley();
+        // await zkappWorkerClient.setActiveInstanceToLocal();
 
-        // const mina = (window as any).mina;
+        const mina = (window as any).mina;
 
-        // if (mina == null) {
-        //   setState({ ...state, hasWallet: false });
-        //   return;
-        // }
+        if (mina == null) {
+          setState({ ...state, hasWallet: false });
+          return;
+        }
+
+        
 
         // const publicKeyBase58 : string = (await mina.requestAccounts())[0];
         // const publicKey = PublicKey.fromBase58(publicKeyBase58);
@@ -73,17 +78,12 @@ export default function App() {
         await zkappWorkerClient.compileContract();
         console.log('zkApp compiled');
 
-        // const zkappPublicKey = PublicKey.fromBase58('B62qph2VodgSo5NKn9gZta5BHNxppgZMDUihf1g7mXreL4uPJFXDGDA');
-        const zkappPublicKey = PublicKey.fromBase58('B62qkFzjHYDXq5qnFL7Q3Z63H94vUVPprA6HVULkW8rGtowLDeRusEz');
+        const zkappPublicKey = PublicKey.fromBase58('B62qmJHgz9hq2Jxsz7DLXUCN3j7sioJb2BLoknqzLb4iyBSknPAJFsW');
 
-        console.log("deploying")
-        await zkappWorkerClient.deployContract();
-
-        console.log("initializing")
-        await zkappWorkerClient.initContract();
-
+        await zkappWorkerClient.initZkappInstance(zkappPublicKey);
+        
         console.log('getting zkApp state...');
-        // await zkappWorkerClient.fetchAccount({ publicKey: zkappPublicKey })
+        await zkappWorkerClient.fetchAccount({ publicKey: zkappPublicKey })
         const currentNum = await zkappWorkerClient.getNum();
         console.log('current state:', currentNum.toString());
 
@@ -93,9 +93,9 @@ export default function App() {
             hasWallet: true,
             hasBeenSetup: true, 
             // publicKey, 
-            zkappPublicKey, 
+            zkappPublicKey: zkappPublicKey, 
             // accountExists, 
-            currentNum
+            currentNum: currentNum
         });
       }
     })();
@@ -263,30 +263,30 @@ export default function App() {
 
       // await state.zkappWorkerClient!.fetchAccount({ publicKey: state.publicKey! });
 
-      let txCreated = await state.zkappWorkerClient!.sendValidateNFTHolderTransactionLocal(ETHAccount!, "161");
+      let txCreated = await state.zkappWorkerClient!.createValidateNFTHolderTransaction(ETHAccount!, "161");
       if(txCreated){
-        console.log('transaction created...');
-        // await state.zkappWorkerClient!.proveUpdateTransaction();
+        console.log('transaction created...now to prove it');
+        await state.zkappWorkerClient!.proveUpdateTransaction();
 
-        // console.log('getting Transaction JSON...');
-        // const transactionJSON = await state.zkappWorkerClient!.getTransactionJSON()
-        // console.log(transactionJSON);
-        // console.log('requesting send transaction...');
-        // const { hash } = await (window as any).mina.sendTransaction({
-        //   transaction: transactionJSON,
-        //   feePayer: {
-        //     fee: transactionFee,
-        //     memo: '',
-        //   },
-        // });
+        console.log('getting Transaction JSON...');
+        const transactionJSON = await state.zkappWorkerClient!.getTransactionJSON()
+        console.log(transactionJSON);
+        console.log('requesting send transaction...');
+        const { hash } = await (window as any).mina.sendTransaction({
+          transaction: transactionJSON,
+          feePayer: {
+            fee: transactionFee,
+            memo: '',
+          },
+        });
 
-        // console.log(
-        //   'See transaction at https://berkeley.minaexplorer.com/transaction/' + hash
-        // );
-        // txns.push('https://berkeley.minaexplorer.com/transaction/' + hash);
-        // setState({ ...state, creatingTransaction: false });
-        // setLoadTxnClass('d-none');
-        // setClaimViewClass('d-none');
+        console.log(
+          'See transaction at https://berkeley.minaexplorer.com/transaction/' + hash
+        );
+        txns.push('https://berkeley.minaexplorer.com/transaction/' + hash);
+        setState({ ...state, creatingTransaction: false });
+        setLoadTxnClass('d-none');
+        setClaimViewClass('d-none');
 
         return true;
 
@@ -654,6 +654,18 @@ let claimContent =
     const publicKeyBase58 : string = (await mina.requestAccounts())[0];
     const publicKey = PublicKey.fromBase58(publicKeyBase58);
     setMinaAccount(publicKeyBase58);
+    const walletConnected = true;
+
+    console.log('checking if account exists...');
+    const res = await state.zkappWorkerClient!.fetchAccount({ publicKey: publicKey! });
+    const accountExists = res.error == null;
+
+    setState({ 
+      ...state, 
+      publicKey: publicKey, 
+      walletConnected: walletConnected,
+      accountExists: accountExists
+    });
   }
 
   ETHWalletButton = (ETHAccount === null)?
