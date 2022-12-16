@@ -746,15 +746,17 @@ let claimContent =
     <Container fluid="sm" className="text-center">
     <Row>
       <Col>
-        <Button onClick={onValidateHolder} disabled={state.creatingTransaction}> Verify </Button>
+        <Button onClick={onValidateHolder} disabled={state.creatingTransaction}> Check Eligibility </Button>
       </Col>
     </Row>
     <br></br>
-    <Row>
+    <Row className={state.loggedIn!?"d-none text-center":"d-block text-center"}>
       <Col>
-        <Button onClick={onSignUp} disabled={state.creatingTransaction}> Sign Up </Button>
+        <Button onClick={onSignUp} disabled={state.creatingTransaction} > Sign Up </Button>
       </Col>
     </Row>
+    <br></br>
+
     <Row>
       <Col>
         <Button onClick={onQuickLogin} disabled={state.creatingTransaction}>{state.loggedIn!?"Log Out":"Log In"}</Button>
@@ -927,11 +929,20 @@ let claimContent =
     </div>
 
 
-  
+  let connectWalletMessage = 
+  <Container fluid="sm" className="text-center">
+    <Row>
+      <Col>
+      <h4>Connect Your Wallets to Sign Up/Log In</h4>
+      </Col>
+    </Row>
+  </Container>
+
 
 
 
   return <div>
+    
     <br></br>
     { ETHWalletButton }
     <br></br>
@@ -942,7 +953,11 @@ let claimContent =
    { accountDoesNotExist }
    
    {/* { mainContent } */}
-   { validateContent }
+   {
+    (MinaAccount && ETHAccount)?
+    validateContent:
+    connectWalletMessage
+   }
    {confettiContent}
    {claimContent}
    {loadingSpinner}
