@@ -651,7 +651,29 @@ let claimContent =
   //   </Container>
   // }
 
+  let checkEligibilityButton = 
+  <Row>
+    <Col>
+      <Button  onClick={onValidateHolder} disabled={state.creatingTransaction}> Check Eligibility </Button>
+    </Col>
+</Row>;
+
+let signUpButton = 
+<Row className={state.loggedIn!?"d-none text-center":"d-block text-center"}>
+  <Col>
+    <Button onClick={onSignUp} disabled={state.creatingTransaction} > Sign Up </Button>
+  </Col>
+</Row>;
+
+let loginButton = 
+<Row>
+  <Col>
+    <Button onClick={onQuickLogin} disabled={state.creatingTransaction}>{state.loggedIn!?"Log Out":"Log In"}</Button>
+  </Col>
+</Row>;
+
   let mainContent, validateContent, transactionContent;
+
   if (state.hasBeenSetup ) {
 
   // if (state.hasBeenSetup && state.accountExists) {
@@ -746,7 +768,7 @@ let claimContent =
     <Container fluid="sm" className="text-center">
     <Row>
       <Col>
-        <Button onClick={onValidateHolder} disabled={state.creatingTransaction}> Check Eligibility </Button>
+        <Button  onClick={onValidateHolder} disabled={state.creatingTransaction}> Check Eligibility </Button>
       </Col>
     </Row>
     <br></br>
@@ -899,6 +921,7 @@ let claimContent =
       </div>:
     <div className="text-center">
       <header className="App-header">
+      <title>Proof of Ownership</title>
         {/* <img  className="App-logo" alt="logo" /> */}
         {/* <p>
           ETH wallet connected as: {ETHAccount}
@@ -944,26 +967,47 @@ let claimContent =
     </Row>
   </Container>
 
+let walletNav = 
+<ul className="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+  <li className="nav-item">{ ETHWalletButton }</li>
+  <li className="nav-item">{ MinaWalletButton }</li>
+</ul>
+
+let loginNav =
+<ul className="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+  <li className="nav-item">{ checkEligibilityButton }</li>
+  <li className="nav-item">{ signUpButton }</li>
+  <li className="nav-item">{ loginButton }</li>
+
+</ul>
+
+let navigation = 
+<nav className="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <Container>
+        <a className="navbar-brand" href="#page-top"><img src="assets/img/navbar-logo.svg" alt="..." /></a>
+        <Button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i className="fas fa-bars ms-1"></i>
+        </Button>
+        <div className="collapse navbar-collapse" id="navbarResponsive">
+        {(MinaAccount && ETHAccount)?
+          loginNav:
+          walletNav
+        }
+        </div>
+    </Container>
+</nav>
 
 
 
   return <div>
-    
-    <br></br>
-    { ETHWalletButton }
-    <br></br>
-    { MinaWalletButton }
+    { navigation }
 
    { logoContent }
    { setup }
    { accountDoesNotExist }
    
-   {/* { mainContent } */}
-   {
-    (MinaAccount && ETHAccount)?
-    validateContent:
-    connectWalletMessage
-   }
+  
    {confettiContent}
    {claimContent}
    {loadingSpinner}
