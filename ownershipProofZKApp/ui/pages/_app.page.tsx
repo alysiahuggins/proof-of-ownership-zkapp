@@ -900,8 +900,11 @@ let claimContent =
     <div className="text-center">
       <header className="App-header">
         {/* <img  className="App-logo" alt="logo" /> */}
-        <p>
+        {/* <p>
           ETH wallet connected as: {ETHAccount}
+        </p> */}
+        <p>
+          ETH wallet connected
         </p>
       </header>
     </div>
@@ -922,8 +925,11 @@ let claimContent =
     <div className="text-center">
     <header className="App-header">
       {/* <img  className="App-logo" alt="logo" /> */}
-      <p>
+      {/* <p>
         Mina wallet connected as: {MinaAccount}
+      </p> */}
+      <p>
+        Mina wallet connected
       </p>
     </header>
     </div>
