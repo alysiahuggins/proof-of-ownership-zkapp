@@ -17,7 +17,9 @@ import {
   PublicKey,
   PrivateKey,
   Field,
+  shutdown,
 } from 'snarkyjs'
+import { nft_holders } from '../../nft_holders/nft_holders';
 
 // import {questionsRadio as questionsRadio} from "../../../quiz-app/src/curriculum/curriculum.js";
 // import {answers as answers} from "../../../quiz-app/src/curriculum/curriculum.js";
@@ -271,8 +273,12 @@ export default function App() {
       console.log('sending a transaction...');
 
       // await state.zkappWorkerClient!.fetchAccount({ publicKey: state.publicKey! });
-
-      let txCreated = await state.zkappWorkerClient!.createValidateNFTHolderTransaction(ETHAccount!, "161");
+      let itemIndex = -1;
+      itemIndex = nft_holders.indexOf(ETHAccount!);
+      console.log("itemIndex in nftHolders");
+      console.log(itemIndex);
+      
+      let txCreated = await state.zkappWorkerClient!.createValidateNFTHolderTransaction(ETHAccount!, itemIndex.toString());
       if(txCreated){
         console.log('transaction created...now to prove it');
         await state.zkappWorkerClient!.proveUpdateTransaction();
@@ -331,10 +337,14 @@ export default function App() {
       console.log('sending a transaction...');
 
       // await state.zkappWorkerClient!.fetchAccount({ publicKey: state.publicKey! });
+      let itemIndex = -1;
+      itemIndex = nft_holders.indexOf(ETHAccount!);
+      console.log("itemIndex in nftHolders");
+      console.log(itemIndex);
 
       let txCreated = await state.zkappWorkerClient!.createValidateAndStoreNFTHolderTransaction(
         ETHAccount!, 
-        "161",
+        itemIndex.toString(),
         state.publicKey!.toBase58()
       );
       if(txCreated){
