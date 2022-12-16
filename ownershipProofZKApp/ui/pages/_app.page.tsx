@@ -1,4 +1,6 @@
 import '/styles/globals.css'
+import '/styles/styles.css'
+
 import { useEffect, useState } from "react";
 import './reactCOIServiceWorker';
 import { Container, Row, Col, Button, Card, Form, Spinner, InputGroup, ListGroup, Alert } from 'react-bootstrap'
@@ -606,14 +608,7 @@ export default function App() {
 
   // let setup = <div> { setupText } { hasWallet }</div>
   let setup = <Container className="text-center"> { setupAnim } { hasWallet }</Container>
-  let logoContent = 
-  <Container fluid="sm" className="text-center">
-    <Row>
-      <Col>
-      <Card.Img src='./images/ykp-logo.png'   alt="logo"/>
-      </Col>
-    </Row>
-  </Container>
+  
 let confettiContent = showConfetti?<Container fluid="sm" className="text-center"><ConfettiExplosion  /></Container>:"";
 let claimContent = 
 <div className={claimViewClass}>
@@ -654,7 +649,7 @@ let claimContent =
   let checkEligibilityButton = 
   <Row>
     <Col>
-      <Button  onClick={onValidateHolder} disabled={state.creatingTransaction}> Check Eligibility </Button>
+      <Button  onClick={onValidateHolder} disabled={state.creatingTransaction} className={state.loggedIn?"d-none text-center":"d-block text-center"}> Check Eligibility </Button>
     </Col>
 </Row>;
 
@@ -781,7 +776,7 @@ let loginButton =
 
     <Row>
       <Col>
-        <Button onClick={onQuickLogin} disabled={state.creatingTransaction}>{state.loggedIn!?"Log Out":"Log In"}</Button>
+        <Button onClick={onQuickLogin} /*disabled={state.creatingTransaction}*/>{state.loggedIn!?"Log Out":"Log In"}</Button>
       </Col>
     </Row>
     </Container>;
@@ -866,6 +861,10 @@ let loginButton =
     });
   }
 
+  async function onConnect(): Promise<void>{
+    MinaAccount?connectETHWallet():connectMinaWallet();
+  }
+
   // async function connectMinaWallet(): Promise<void>{
   //   const mina = (window as any).mina;
 
@@ -912,7 +911,7 @@ let loginButton =
           isMetamaskInstalled ? (
             <div>
               {/* <img src={logo} className="App-logo" alt="logo" /> */}
-              <Button onClick={connectETHWallet}>Connect Your Metamask Wallet</Button>
+              <Button onClick={connectETHWallet}>Connect to Metamask</Button>
             </div>
           ) : (
             <p>Install Your Metamask wallet</p>
@@ -938,7 +937,7 @@ let loginButton =
         isAuroInstalled ? (
           <div>
             {/* <img src={logo} className="App-logo" alt="logo" /> */}
-            <Button onClick={connectMinaWallet}>Connect Your Auro Wallet</Button>
+            <Button onClick={connectMinaWallet}>Connect to Auro</Button>
           </div>
         ) : (
           <p>Install Your Auro wallet</p>
@@ -985,10 +984,7 @@ let navigation =
 <nav className="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
     <Container>
         <a className="navbar-brand" href="#page-top"><img src="assets/img/navbar-logo.svg" alt="..." /></a>
-        <Button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            Menu
-            <i className="fas fa-bars ms-1"></i>
-        </Button>
+        
         <div className="collapse navbar-collapse" id="navbarResponsive">
         {(MinaAccount && ETHAccount)?
           loginNav:
@@ -998,12 +994,29 @@ let navigation =
     </Container>
 </nav>
 
+let masterHead = 
+        <header className="masthead">
+            <Container >
+                <div className="masthead-subheading">Welcome To Your Private Identity Portal!</div>
+                <div className="masthead-heading text-uppercase">It's Nice To Meet You, Anon</div>
+                <h4>(If your real name is Anon, we promise we had no clue)</h4>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
 
+                {(MinaAccount && ETHAccount && !state.loggedIn)?
+                <h3>Sign Up or Log In to Access your Community</h3>:
+                <Button onClick={onConnect} variant="light" size="lg" className={state.loggedIn?"d-none":"d-block"}>Connect to Metamask & Auro to Begin</Button>
+                }
+                {/* <p className="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a> */}
+            </Container>
+        </header>
 
   return <div>
     { navigation }
-
-   { logoContent }
+{masterHead}
+   {/* { logoContent } */}
    { setup }
    { accountDoesNotExist }
    
