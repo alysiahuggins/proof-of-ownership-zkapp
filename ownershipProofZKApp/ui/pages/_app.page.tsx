@@ -850,8 +850,8 @@ let loginButton =
     const walletConnected = true;
 
     console.log('checking if account exists...');
-    const res = await state.zkappWorkerClient!.fetchAccount({ publicKey: publicKey! });
-    const accountExists = res.error == null;
+    const res = await state.zkappWorkerClient?.fetchAccount({ publicKey: publicKey! });
+    const accountExists = res?.error == null;
 
     setState({ 
       ...state, 
@@ -865,45 +865,7 @@ let loginButton =
     MinaAccount?connectETHWallet():connectMinaWallet();
   }
 
-  // async function connectMinaWallet(): Promise<void>{
-  //   const mina = (window as any).mina;
-
-  //   if (mina == null) {
-  //     setState({ ...state, hasWallet: false });
-  //     return;
-  //   }
-
-  //   const publicKeyBase58 : string = (await mina.requestAccounts())[0];
-  //   const publicKey = PublicKey.fromBase58(publicKeyBase58);
-  //   console.log(`public key`);
-  //   console.log(publicKey);
-
-  //   const walletConnected = true;
-
-    
-
-  //   setState({ 
-  //     ...state, 
-  //     publicKey: publicKey, 
-  //     walletConnected: walletConnected,
-  //   });
-  //   console.log('state public key');
-  //   console.log(state.publicKey!);
-
-  //   setMinaAccount(publicKeyBase58);
-
-  //   console.log('checking if account exists...');
-  //   const res = await state.zkappWorkerClient!.fetchAccount({ 
-  //     publicKey: PublicKey.fromBase58(MinaAccount!) 
-  //   });
-  //   const accountExists = res.error == null;
-
-  //   setState({ 
-  //     ...state, 
-  //     accountExists: accountExists
-  //   });
-
-  // }
+ 
 
   ETHWalletButton = (ETHAccount === null)?
       <div className="text-center">
@@ -995,27 +957,28 @@ let navigation =
 </nav>
 
 let masterHead = 
-        <header className="masthead">
-            <Container >
-                <div className="masthead-subheading">Welcome To Your Private Identity Portal!</div>
-                <div className="masthead-heading text-uppercase">It's Nice To Meet You, Anon</div>
-                <h4>(If your real name is Anon, we promise we had no clue)</h4>
-                <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
+  <header className="masthead">
+      <Container >
+          <div className="masthead-subheading">Welcome To Your Private Identity Portal!</div>
+          <div className="masthead-heading text-uppercase">It's Nice To Meet You, Anon</div>
+          <h4>(If your real name is Anon, we promise we had no clue)</h4>
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
 
-                {(MinaAccount && ETHAccount && !state.loggedIn)?
-                <h3>Sign Up or Log In to Access your Community</h3>:
-                <Button onClick={onConnect} variant="light" size="lg" className={state.loggedIn?"d-none":"d-block"}>Connect to Metamask & Auro to Begin</Button>
-                }
-                {/* <p className="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a> */}
-            </Container>
-        </header>
+          {(MinaAccount && ETHAccount && !state.loggedIn)?
+          <h3>Sign Up or Log In to Access your Community</h3>:
+          <Button onClick={onConnect} variant="light" size="lg" className={state.loggedIn?"d-none":"d-block"}>Connect to Metamask & Auro to Begin</Button>
+          }
+          {/* <p className="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a> */}
+      </Container>
+  </header>
+
 
   return <div>
     { navigation }
-{masterHead}
+    { masterHead }
    {/* { logoContent } */}
    { setup }
    { accountDoesNotExist }
