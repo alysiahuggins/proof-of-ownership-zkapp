@@ -215,8 +215,6 @@ const functions = {
           }
       );
 
-      
-
       state.transaction = transaction;
       
       state.transaction!.prove();

@@ -37,6 +37,7 @@ export default function App() {
     claimRewardsDisabled: true,
     walletConnected: false,
     validatedAddresses: null as null | string [],
+    loggedIn: false,
   });
 
   // -------------------------------------------------------
@@ -411,6 +412,70 @@ export default function App() {
     
   }
 
+  // -------------------------------------------------------
+  // Quick Login - Checks the local storage
+
+  const onQuickLogin = async () => {
+    try{
+      if(state.loggedIn){
+        onLogout();
+      }else{
+        setState({ ...state, creatingTransaction: true });
+      setLoadTxnClass('d-block');
+      console.log('sending a transaction...');
+
+      validatedAddresses = ls.get('validatedAddresses');
+      console.log(validatedAddresses);
+      console.log(MinaAccount!);
+      console.log(validatedAddresses.includes(MinaAccount!));
+      if(validatedAddresses.includes(MinaAccount!)){
+      
+        setState({ ...state, creatingTransaction: false });
+        setLoadTxnClass('d-none');
+        setClaimViewClass('d-none');
+        console.log('Logged in!')
+        setState({ ...state, loggedIn: true });
+          
+        return true;
+
+      }else{
+        setState({ ...state, creatingTransaction: false });
+        setLoadTxnClass('d-none');
+        setClaimViewClass('d-none');
+        console.log("not logged in");
+        return false;
+    }
+      
+      
+    }
+      }
+      catch(e){
+        setState({ ...state, creatingTransaction: false });
+        setClaimViewClass('d-none');
+        setLoadTxnClass('d-none');
+  
+        console.log("error caught")
+        console.log(e)
+        console.log("not logged in");
+  
+        return false
+      }
+      
+  }
+
+
+  // -------------------------------------------------------
+  //  Logout - Checks the local storage
+
+  const onLogout = async () => {
+      if(state.loggedIn!){
+        setState({ ...state, loggedIn: false });
+        console.log('Logged out')
+        return true;
+      }
+  }
+  
+
 
   
   // -------------------------------------------------------
@@ -688,6 +753,11 @@ let claimContent =
     <Row>
       <Col>
         <Button onClick={onSignUp} disabled={state.creatingTransaction}> Sign Up </Button>
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+        <Button onClick={onQuickLogin} disabled={state.creatingTransaction}>{state.loggedIn!?"Log Out":"Log In"}</Button>
       </Col>
     </Row>
     </Container>;
