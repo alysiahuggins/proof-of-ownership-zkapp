@@ -50,15 +50,20 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
         - Allow user to vote annonymously & tally votes (how do you get the info from that position in the merkle tree? - try the merkle tree example and see if you can figure it out)
 - Create a Front-end that allows the user to
     - Prove Ownership
-        - connect to ETH button (Done)
-        - connect to Mina Button (Done)
+        - connect to ETH button (DONE)
+        - connect to Mina Button (DONE)
         - one button to connect wallets
         - allow switch Account with Metamask
-    - Connect Frontend to Berkeley
+    - Connect Frontend to Berkeley (DONE)
+    - Sign Up Button
+    - Sign In Button
+    - Offchain Storage for users who have signed up
     - Submit an email address associated with their account
     - Update an email address associated with their account
     - Show authenticated users the information they are seeking
     - Allow authenticated users to sign into the app with their ETH address once they have authenticated once
+    - Create widget
+    - Create Example App that uses it e.g. a Voting app
 - Testing
 - Create Presentation
 - UI Adjustment

@@ -220,17 +220,7 @@ const functions = {
   },
   getTransactionJSON: async (args: {}) => {
     return state.transaction!.toJSON();
-  },
-  signTransaction: async (args: {privateKey: PrivateKey}) => {
-    try{
-      await state.transaction!.sign(privateKey);
-      return true;
-    }catch(e){
-      console.log("error from proof")
-      console.log(e)
-      return false;
-    }
-  },
+  }
   
   
 };
