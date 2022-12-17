@@ -2,7 +2,17 @@
 Building this project on the Mina Blockchain as part of the zk-ignite program https://minaprotocol.com/blog/zkignite-cohort0
 
 ## Objective
-- Prove ownership of a digital collection without revealing your blockchain address and which item you own.
+- To Create a Sign in With Mina Widget
+- You gain access by proving ownership of a digital collection (on other chains like Ethereum) without revealing your blockchain address and which item you own.
+- This widget can then be used in other apps and once access is gained, you can participate in activities such as private voting etc.
+
+
+## What was accomplished
+- the widget itself was not created (UI) but there is a UI to sign up and log in
+- the voting code was implemented and tested but not in the UI
+
+## ZK App Components used
+- Merkle trees for storing  NFT Holders and Validated Mina Accounts
 
 ## ZkApp Concerns
 **Private Input**
