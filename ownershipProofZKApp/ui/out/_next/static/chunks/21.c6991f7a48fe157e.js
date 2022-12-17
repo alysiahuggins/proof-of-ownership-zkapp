@@ -1187,7 +1187,7 @@ if (true) {
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	!function() {
-/******/ 		__webpack_require__.p = "/code-on-chain-with-mina//_next/";
+/******/ 		__webpack_require__.p = "/proof-of-ownership-zkapp//_next/";
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/importScripts chunk loading */
