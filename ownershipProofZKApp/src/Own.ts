@@ -146,7 +146,7 @@ export class Own extends SmartContract {
         path.calculateRoot(Poseidon.hash(nftHolder.toFields())).assertEquals(commitment);
     }
 
-    @method vote(candidate: Candidate, path: CandidateWitness) {
+    @method voteForCandidate(candidate: Candidate, path: CandidateWitness) {
         // get the on-chain commitment
         let commitment = this.commitmentCandidates.get();
         this.commitmentCandidates.assertEquals(commitment);
