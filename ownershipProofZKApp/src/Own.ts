@@ -10,13 +10,15 @@ import { Field, SmartContract, state, State, method, isReady, DeployArgs,
     MerkleWitness,
     PublicKey
 } from 'snarkyjs';
-import { nft_holders } from '../nft_holders/nft_holders.js';
+import { nft_holders } from '../data/nft_holders.js';
 
 await isReady; //comment this when deploying to berkeley, uncomment when running locally
 let initialBalance = 100_000_000_000;
 let nftHoldersTree = new MerkleTree(10);
 let validatedNFTHoldersTree = new MerkleTree(10);
 export class NFTHolderWitness extends MerkleWitness(10) {}
+export class CandidateWitness extends MerkleWitness(10) {}
+
 
 
 export class NFTHolder extends CircuitValue {
@@ -29,6 +31,25 @@ export class NFTHolder extends CircuitValue {
   
     hash(): Field {
       return Poseidon.hash(this.toFields());
+    }
+}
+
+class Candidate extends CircuitValue {
+    @prop publicKey: PublicKey;
+    @prop points: UInt32;
+  
+    constructor(publicKey: PublicKey, points: UInt32) {
+      super(publicKey, points);
+      this.publicKey = publicKey;
+      this.points = points;
+    }
+  
+    hash(): Field {
+      return Poseidon.hash(this.toFields());
+    }
+  
+    addPoints(n: number): Candidate {
+      return new Candidate(this.publicKey, this.points.add(n));
     }
 }
 
@@ -48,6 +69,8 @@ export class Own extends SmartContract {
     @state(Field) commitmentNFTHolders = State<Field>();
     @state(Field) validatedNFTHoldersTotal = State<Field>();
     @state(Field) commitmentValidatedNFTHolders = State<Field>();
+    @state(Field) commitmentCandidates = State<Field>();
+
 
 
     deploy(args: DeployArgs){
@@ -65,7 +88,6 @@ export class Own extends SmartContract {
         //store the root of the merkle tree in the app state
         this.commitmentNFTHolders.set(createNFTHoldersMerkleTree().getRoot());
         this.validatedNFTHoldersTotal.set(Field(0));
-
     }
 
     @method validateNFTHolder(nftHolder: NFTHolder, path: NFTHolderWitness){
@@ -106,6 +128,34 @@ export class Own extends SmartContract {
         path.calculateRoot(Poseidon.hash(nftHolder.toFields())).assertEquals(commitment);
     }
 
+    @method vote(candidate: Candidate, path: CandidateWitness) {
+        // get the on-chain commitment
+        let commitment = this.commitmentCandidates.get();
+        this.commitmentCandidates.assertEquals(commitment);
+
+        // check that the candidate is in the Merkle Tree
+        path.calculateRoot(candidate.hash()).assertEquals(commitment);
+
+        // update the candidate and add one point!
+        let newCandidate = candidate.addPoints(1);
+
+        // calculate the new Merkle Root, with the candidate updates
+        let newCommitment = path.calculateRoot(newCandidate.hash());
+
+        this.commitmentCandidates.set(newCommitment);
+    }
+
+    @method updateNFTHolders(nftHolder: NFTHolder, path: NFTHolderWitness){
+        let commitment = this.commitmentNFTHolders.get();
+        this.commitmentNFTHolders.assertEquals(commitment);
+    
+        // TODO check if path is empty
+
+        // calculate the new Merkle Root, with the candidate updates
+        let newCommitment = path.calculateRoot(nftHolder.hash());
+
+        this.commitmentNFTHolders.set(newCommitment);
+    }
 
   }
   

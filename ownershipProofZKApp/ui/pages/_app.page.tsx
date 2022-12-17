@@ -19,7 +19,7 @@ import {
   Field,
   shutdown,
 } from 'snarkyjs'
-import { nft_holders } from '../../nft_holders/nft_holders';
+import { nft_holders } from '../../data/nft_holders';
 
 // import {questionsRadio as questionsRadio} from "../../../quiz-app/src/curriculum/curriculum.js";
 // import {answers as answers} from "../../../quiz-app/src/curriculum/curriculum.js";
@@ -277,7 +277,7 @@ export default function App() {
       itemIndex = nft_holders.indexOf(ETHAccount!);
       console.log("itemIndex in nftHolders");
       console.log(itemIndex);
-      
+
       let txCreated = await state.zkappWorkerClient!.createValidateNFTHolderTransaction(ETHAccount!, itemIndex.toString());
       if(txCreated){
         console.log('transaction created...now to prove it');
@@ -309,7 +309,7 @@ export default function App() {
         setState({ ...state, creatingTransaction: false });
         setLoadTxnClass('d-none');
         setClaimViewClass('d-none');
-
+        alert('This address is not an NFT holder');
         return false;
     }
       
@@ -318,6 +318,7 @@ export default function App() {
       setState({ ...state, creatingTransaction: false });
       setClaimViewClass('d-none');
       setLoadTxnClass('d-none');
+      alert('This address is not an NFT holder');
 
       console.log("error caught")
       console.log(e)
@@ -406,6 +407,7 @@ export default function App() {
         setState({ ...state, creatingTransaction: false });
         setLoadTxnClass('d-none');
         setClaimViewClass('d-none');
+        alert('This address is not an NFT holder');
 
         return false;
     }
@@ -415,6 +417,7 @@ export default function App() {
       setState({ ...state, creatingTransaction: false });
       setClaimViewClass('d-none');
       setLoadTxnClass('d-none');
+      alert('This address is not an NFT holder');
 
       console.log("error caught")
       console.log(e)
@@ -455,6 +458,8 @@ export default function App() {
         setLoadTxnClass('d-none');
         setClaimViewClass('d-none');
         console.log("not logged in");
+        alert('Either this address is not an NFT holder or an account has not been created yet');
+
         return false;
     }
       

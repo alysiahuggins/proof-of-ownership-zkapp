@@ -23,7 +23,7 @@ type Transaction = Awaited<ReturnType<typeof Mina.transaction>>;
 
 import type { Own } from '../../build/src/Own.js';
 // import  { createNFTHoldersMerkleTree, NFTHolderWitness, NFTHolder } from '../../../build/src/Own.js';
-import { nft_holders } from '../../nft_holders/nft_holders.js';
+import { nft_holders } from '../../data/nft_holders.js';
 
 // import { MyMerkleWitness } from '../../contracts/src/Classes';
 

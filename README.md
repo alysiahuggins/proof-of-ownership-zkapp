@@ -77,7 +77,7 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
 - Check out leaderboard app and see if voting can work
 - implement voting smart contract
 - display voting option
-
+- create NFT collection that others can mint so that they can test various wallets
 
 
 
