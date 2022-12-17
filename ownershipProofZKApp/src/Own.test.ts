@@ -10,7 +10,7 @@ import {
   CircuitString,
   MerkleTree,
 } from 'snarkyjs';
- import {nft_holders} from '../data/nft_holders.js'
+import { getNFTHolders, setNFTHolder } from '../nft_holders/nft_holders.js';
 /*
  * This file specifies how to test the `Add` example smart contract. It is safe to delete this file and replace
  * with your own tests.
@@ -21,6 +21,8 @@ import {
 let proofsEnabled = false;
 let initialBalance = 100_000_000_000;
 const merkleTree = createNFTHoldersMerkleTree();
+const nft_holders:any = getNFTHolders();
+console.log(nft_holders);
 
 function createMockNFTHoldersMerkleTree(holders: string[]){
     let nftHoldersTree = new MerkleTree(10);

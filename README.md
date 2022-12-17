@@ -119,6 +119,9 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
 Address = B62qmJHgz9hq2Jxsz7DLXUCN3j7sioJb2BLoknqzLb4iyBSknPAJFsW
 Deployment transaction = https://berkeley.minaexplorer.com/transaction/Ckpa7VhZLcUeuKpAEDAqGpd1nEgMzHbtKhiVvZ9PaoqHYAENzcvYD
 
+2nd Deploy address 'mock-nft' branch
+Address = B62qjof7o8wD7psiiS51gJY1haBDGg6pcYzJ2kMfh3LgZtnV8ufVYnX
+Deployment transaction = 
 ## Run Berkeley Tester locally
 `npm run build && node build/src/mainYKBerkeley.js berkeley `
 

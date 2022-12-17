@@ -19,7 +19,8 @@ import {
   Field,
   shutdown,
 } from 'snarkyjs'
-import { nft_holders } from '../../data/nft_holders';
+import { getNFTHolders, setNFTHolder } from '../../nft_holders/nft_holders.js';
+const nft_holders:any = getNFTHolders();
 
 // import {questionsRadio as questionsRadio} from "../../../quiz-app/src/curriculum/curriculum.js";
 // import {answers as answers} from "../../../quiz-app/src/curriculum/curriculum.js";

@@ -1,4 +1,7 @@
-export {nft_holders};
+
+export {setNFTHolder, getNFTHolders, resetNFTHolders, getMockNFTHolders, setMockNFTHolder};
+import * as ls from "local-storage";
+
 
 let nft_holders = [
       "0x00bd58530a64b04f552f2f6a8319e91d70f6b12b",
@@ -280,3 +283,39 @@ let nft_holders = [
       "0xfcbbe3f69f26a482b19e533439779046994df355",
       "0xfd46c092ed3adf846631ee169fcf8c977cbbce3a"
     ];
+
+function getNFTHolders(){
+    console.log('getting holders');
+    let holders = ls.get('nft_holders') | [];
+    if(!holders) {
+        ls.set('nft_holders', nft_holders);
+        return nft_holders;
+    }else{
+
+        holders = ls.get('nft_holders');
+        return holders
+    }
+}
+
+function resetNFTHolders(){
+    ls.set('nft_mock_holders', nft_holders);
+    return nft_holders;
+}
+
+function getMockNFTHolders(){
+    ls.set('nft_mock_holders', nft_holders);
+    return nft_holders;
+}
+
+function setNFTHolder(holder){
+    let temp_nft_holders = nft_holders;
+    let newLength = temp_nft_holders.push(holder);
+    ls.set('nft_holders', temp_nft_holders);
+    return newLength;
+}
+
+function setMockNFTHolder(holder){
+    let newLength = nft_holders.push(holder);
+    ls.set('nft_mock_holders', nft_holders);
+    return newLength;
+}

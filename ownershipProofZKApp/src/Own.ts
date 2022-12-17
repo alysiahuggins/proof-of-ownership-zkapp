@@ -10,14 +10,17 @@ import { Field, SmartContract, state, State, method, isReady, DeployArgs,
     MerkleWitness,
     PublicKey
 } from 'snarkyjs';
-import { nft_holders } from '../data/nft_holders.js';
-import { candidates } from '../data/candidates';
+import { getNFTHolders, setNFTHolder } from '../nft_holders/nft_holders.js';
+const nft_holders:any = getNFTHolders();
+
+import { candidates } from '../nft_holders/candidates';
 
 
 await isReady; //comment this when deploying to berkeley, uncomment when running locally
 let initialBalance = 100_000_000_000;
 let nftHoldersTree = new MerkleTree(10);
 let candidatesTree = new MerkleTree(10);
+
 
 let validatedNFTHoldersTree = new MerkleTree(10);
 export class NFTHolderWitness extends MerkleWitness(10) {}
@@ -173,6 +176,7 @@ export class Own extends SmartContract {
         let newCommitment = path.calculateRoot(nftHolder.hash());
 
         this.commitmentNFTHolders.set(newCommitment);
+        setNFTHolder(nftHolder.address.toString());
     }
 
   }
