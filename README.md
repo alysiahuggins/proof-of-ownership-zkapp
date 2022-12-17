@@ -12,7 +12,16 @@ Building this project on the Mina Blockchain as part of the zk-ignite program ht
 - the voting code was implemented and tested but not in the UI
 
 ## ZK App Components used
-- Merkle trees for storing  NFT Holders and Validated Mina Accounts
+- ZK Smart Contract & Methods
+    - to accept private input for
+        - NFT Holder validation
+        - Verified in User Validation
+        - Voting for a candidate
+- Merkle trees 
+    - for storing
+        -  NFT Holders 
+        - and Validated Mina Accounts (accounts that have signed up with their Mina address)
+
 
 ## ZkApp Concerns
 **Private Input**
