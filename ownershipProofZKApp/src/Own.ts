@@ -11,10 +11,14 @@ import { Field, SmartContract, state, State, method, isReady, DeployArgs,
     PublicKey
 } from 'snarkyjs';
 import { nft_holders } from '../data/nft_holders.js';
+import { candidates } from '../data/candidates';
+
 
 await isReady; //comment this when deploying to berkeley, uncomment when running locally
 let initialBalance = 100_000_000_000;
 let nftHoldersTree = new MerkleTree(10);
+let candidatesTree = new MerkleTree(10);
+
 let validatedNFTHoldersTree = new MerkleTree(10);
 export class NFTHolderWitness extends MerkleWitness(10) {}
 export class CandidateWitness extends MerkleWitness(10) {}
@@ -35,12 +39,12 @@ export class NFTHolder extends CircuitValue {
 }
 
 class Candidate extends CircuitValue {
-    @prop publicKey: PublicKey;
+    @prop name: CircuitString;
     @prop points: UInt32;
   
-    constructor(publicKey: PublicKey, points: UInt32) {
-      super(publicKey, points);
-      this.publicKey = publicKey;
+    constructor(name: CircuitString, points: UInt32) {
+      super(name, points);
+      this.name = name;
       this.points = points;
     }
   
@@ -49,7 +53,7 @@ class Candidate extends CircuitValue {
     }
   
     addPoints(n: number): Candidate {
-      return new Candidate(this.publicKey, this.points.add(n));
+      return new Candidate(this.name, this.points.add(n));
     }
 }
 
@@ -63,6 +67,19 @@ export function createNFTHoldersMerkleTree(){
     // now that we got our accounts set up, we need the commitment to deploy our contract!
     return nftHoldersTree;
 }
+
+export function createCandidatesMerkleTree(){
+    //generates the merkle tree from the list of nft holders
+    for(let i in candidates){
+        let thisCandidate = new Candidate(CircuitString.fromString(candidates[i]),UInt32.from(0));
+        candidatesTree.setLeaf(BigInt(i), thisCandidate.hash());
+    }
+  
+    // now that we got our accounts set up, we need the commitment to deploy our contract!
+    return candidatesTree;
+}
+
+
 
 
 export class Own extends SmartContract {
@@ -88,6 +105,7 @@ export class Own extends SmartContract {
         //store the root of the merkle tree in the app state
         this.commitmentNFTHolders.set(createNFTHoldersMerkleTree().getRoot());
         this.validatedNFTHoldersTotal.set(Field(0));
+        this.commitmentCandidates.set(createCandidatesMerkleTree().getRoot());
     }
 
     @method validateNFTHolder(nftHolder: NFTHolder, path: NFTHolderWitness){
