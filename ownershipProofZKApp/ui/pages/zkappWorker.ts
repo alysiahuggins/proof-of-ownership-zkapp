@@ -202,6 +202,26 @@ const functions = {
       return false;
     }
   },
+  createLogInTransaction: async (args: {response: string, holderPosition: string}) => {
+    try{
+      console.log(args.response);
+      console.log(args.holderPosition);
+      let w = state.nftHoldersTree!.getWitness(BigInt(args.holderPosition));
+      let witness = new NFTHolderWitness(w);
+      const transaction = await Mina.transaction(() => {
+          state.zkapp!.verifyAlreadyValidated(
+            new NFTHolder(CircuitString.fromString((args.response))),
+          witness);
+        }
+      );
+      state.transaction = transaction;
+      return true;
+    }catch(e){ 
+      console.log("error from create tx")
+      console.log(e)
+      return false;
+    }
+  },
 
   sendValidateNFTHolderTransactionLocal: async (args: {response: string, holderPosition: string}) => {
     try{

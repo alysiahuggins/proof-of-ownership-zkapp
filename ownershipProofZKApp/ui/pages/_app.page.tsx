@@ -25,6 +25,7 @@ import { nft_holders } from '../../nft_holders/nft_holders';
 // import {answers as answers} from "../../../quiz-app/src/curriculum/curriculum.js";
 let index = 0;
 let validatedAddresses: string[] = [];
+const validatedAddressKey = "validatedAddresses";
 
 let transactionFee = 0.1;
 export default function App() {
@@ -50,8 +51,8 @@ export default function App() {
   useEffect(() => {
     (async () => {
       if (!state.hasBeenSetup) {
-        validatedAddresses = ls.get('validatedAddresses');
-        console.log(`validatedAddresses`)
+        validatedAddresses = ls.get(validatedAddressKey);
+        console.log(validatedAddressKey)
         console.log(validatedAddresses);
         const zkappWorkerClient = new ZkappWorkerClient();
         
@@ -383,7 +384,7 @@ export default function App() {
         });
         console.log("validated Addresses");
         console.log(state.validatedAddresses!);
-        ls.set('validatedAddresses', validatedAddresses);
+        ls.set(validatedAddressKey, validatedAddresses);
         let initialState = await state.zkappWorkerClient!.getNumValidatedNFTHolders();
         let appState = initialState;
         console.log(`initial State`);
@@ -439,7 +440,7 @@ export default function App() {
       setLoadTxnClass('d-block');
       console.log('sending a transaction...');
 
-      validatedAddresses = ls.get('validatedAddresses');
+      validatedAddresses = ls.get(validatedAddressKey);
       console.log(validatedAddresses);
       console.log(MinaAccount!);
       console.log(validatedAddresses.includes(MinaAccount!));
@@ -456,7 +457,6 @@ export default function App() {
       }else{
         setState({ ...state, creatingTransaction: false });
         setLoadTxnClass('d-none');
-        setClaimViewClass('d-none');
         console.log("not logged in");
 
         return false;
@@ -467,7 +467,77 @@ export default function App() {
       }
       catch(e){
         setState({ ...state, creatingTransaction: false });
-        setClaimViewClass('d-none');
+        setLoadTxnClass('d-none');
+  
+        console.log("error caught")
+        console.log(e)
+        console.log("not logged in");
+  
+        return false
+      }
+      
+  }
+
+  // -------------------------------------------------------
+  // Mina Login - Checks the blockchain
+
+  const onMinaLogin = async () => {
+    try{
+      if(state.loggedIn){
+        onLogout();
+      }else{
+        setState({ ...state, creatingTransaction: true });
+        setLoadTxnClass('d-block');
+        console.log('sending a transaction...');
+  
+        // await state.zkappWorkerClient!.fetchAccount({ publicKey: state.publicKey! });
+        let itemIndex = -1;
+        itemIndex = state.validatedAddresses!.indexOf(MinaAccount!);
+        console.log("itemIndex in validatedAddresses");
+        console.log(itemIndex);
+  
+        let txCreated = await state.zkappWorkerClient!.createLogInTransaction(
+          MinaAccount!, 
+          itemIndex.toString()
+        );
+        if(txCreated){
+          console.log('transaction created...now to prove it');
+          await state.zkappWorkerClient!.proveUpdateTransaction();
+  
+          console.log('getting Transaction JSON...');
+          const transactionJSON = await state.zkappWorkerClient!.getTransactionJSON()
+          console.log(transactionJSON);
+          console.log('requesting send transaction...');
+          const { hash } = await (window as any).mina.sendTransaction({
+            transaction: transactionJSON,
+            feePayer: {
+              fee: transactionFee,
+              memo: '',
+            },
+          });
+  
+          console.log(
+            'See transaction at https://berkeley.minaexplorer.com/transaction/' + hash
+          );
+          txns.push('https://berkeley.minaexplorer.com/transaction/' + hash);
+          setState({ ...state, creatingTransaction: false });
+          setLoadTxnClass('d-none');
+  
+          setState({ ...state, loggedIn: true });
+
+          return true;
+  
+        }else{
+          setState({ ...state, creatingTransaction: false });
+          setLoadTxnClass('d-none');
+          alert("Mina Account not found");
+          state.loggedIn = false;
+          return false;
+        }
+      }
+      }
+      catch(e){
+        setState({ ...state, creatingTransaction: false });
         setLoadTxnClass('d-none');
   
         console.log("error caught")
@@ -710,6 +780,13 @@ let loginButton =
 <Row>
   <Col>
     <Button onClick={onQuickLogin} disabled={state.creatingTransaction}>{state.loggedIn!?"Log Out":"Log In"}</Button>
+  </Col>
+</Row>;
+
+let loginButtonPlus = 
+<Row>
+  <Col>
+    <Button onClick={onMinaLogin} disabled={state.creatingTransaction}>{state.loggedIn!?"Log Out":"Mina Log In"}</Button>
   </Col>
 </Row>;
 
@@ -985,6 +1062,8 @@ let loginNav =
   <li className="nav-item">{ checkEligibilityButton }</li>
   <li className="nav-item">{ signUpButton }</li>
   <li className="nav-item">{ loginButton }</li>
+  {/* <li className="nav-item">{ loginButtonPlus }</li> */}
+
 
 </ul>
 
