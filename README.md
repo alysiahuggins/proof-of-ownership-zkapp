@@ -74,7 +74,7 @@ https://docs.alchemy.com/docs/how-to-get-a-list-of-nft-holders-for-a-given-colle
 ## Crunch Time ToDos
 - Test adding multiple addresses to validation list
 - Login with a transaction
-- Check out leaderboard app and see if voting can work
+- Check out leaderboard app and see if voting can work (DONE)
 - implement voting smart contract
 - display voting option
 

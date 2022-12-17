@@ -309,7 +309,7 @@ export default function App() {
         setState({ ...state, creatingTransaction: false });
         setLoadTxnClass('d-none');
         setClaimViewClass('d-none');
-
+        alert("NFT Holder not found");
         return false;
     }
       
@@ -318,6 +318,7 @@ export default function App() {
       setState({ ...state, creatingTransaction: false });
       setClaimViewClass('d-none');
       setLoadTxnClass('d-none');
+      alert("NFT Holder not found");
 
       console.log("error caught")
       console.log(e)
@@ -406,6 +407,7 @@ export default function App() {
         setState({ ...state, creatingTransaction: false });
         setLoadTxnClass('d-none');
         setClaimViewClass('d-none');
+        alert("NFT Holder not found");
 
         return false;
     }
@@ -415,6 +417,7 @@ export default function App() {
       setState({ ...state, creatingTransaction: false });
       setClaimViewClass('d-none');
       setLoadTxnClass('d-none');
+      alert("NFT Holder not found");
 
       console.log("error caught")
       console.log(e)
@@ -455,6 +458,7 @@ export default function App() {
         setLoadTxnClass('d-none');
         setClaimViewClass('d-none');
         console.log("not logged in");
+
         return false;
     }
       

@@ -22,6 +22,18 @@ let proofsEnabled = false;
 let initialBalance = 100_000_000_000;
 const merkleTree = createNFTHoldersMerkleTree();
 
+export function createMockNFTHoldersMerkleTree(nft_holders: string[]){
+    //generates the merkle tree from the list of nft holders
+    let nftHoldersTree = new MerkleTree(10);
+    for(let i in nft_holders){
+        let thisHolder = new NFTHolder(CircuitString.fromString(nft_holders[i]));
+        nftHoldersTree.setLeaf(BigInt(i), thisHolder.hash());
+    }
+  
+    // now that we got our accounts set up, we need the commitment to deploy our contract!
+    return nftHoldersTree;
+}
+
 
 describe('Own', () => {
   let deployerAccount: PrivateKey,
@@ -232,6 +244,56 @@ describe('Own', () => {
     
         });
         console.log(`Sending blockchain transaction for address ${0}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
+
+    expect(result).toEqual(true);
+  });
+
+  it('validate the 2nd address & add to validatedMerkleTree in the `Own` smart contract', async () => {
+    // const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(1));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+
+            zkApp.validateAndStoreNFTHolder(new NFTHolder(CircuitString.fromString("0x01b4fae0b350af95d1bd8fb1341d9dce1a87a453")),  
+            witness, (new NFTHolder(CircuitString.fromString("0x01b4fae0b350af95d1bd8fb1341d9dce1a87a453"))));
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for address ${1}`)
+        await txn.send();
+        result = true;
+
+    }catch(e){
+        result = false;
+    }
+
+    let numValidated = zkApp.validatedNFTHoldersTotal.get();
+    result = result && (numValidated.toBigInt().toString()=="1")!;
+    expect(result).toEqual(true);
+  });
+
+  it('validate that already validated address (2nd) is in the validated Holders Merkle Tree in the `Own` smart contract', async () => {
+    // const merkleTree = createNFTHoldersMerkleTree();
+    let w = merkleTree.getWitness(BigInt(1));
+    let witness = new NFTHolderWitness(w);
+    let result = false;
+    try{
+        let txn = await Mina.transaction(deployerAccount, () => {
+
+            zkApp.verifyAlreadyValidated(new NFTHolder(CircuitString.fromString("0x01b4fae0b350af95d1bd8fb1341d9dce1a87a453")),  
+            witness);
+            zkApp.sign(zkAppPrivateKey);
+    
+        });
+        console.log(`Sending blockchain transaction for address ${1}`)
         await txn.send();
         result = true;
 
