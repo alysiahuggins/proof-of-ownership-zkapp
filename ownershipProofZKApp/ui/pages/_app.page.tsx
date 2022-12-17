@@ -1,5 +1,5 @@
 import '/styles/globals.css'
-import '/styles/styles.css'
+// import '/styles/styles.css'
 
 import { useEffect, useState } from "react";
 import './reactCOIServiceWorker';
@@ -624,32 +624,6 @@ export default function App() {
   let setup = <Container className="text-center"> { setupAnim } { hasWallet }</Container>
   
 let confettiContent = showConfetti?<Container fluid="sm" className="text-center"><ConfettiExplosion  /></Container>:"";
-let claimContent = 
-<div className={claimViewClass}>
- 
- 
-  <Container fluid="sm" className="text-center">
-    <Row  >
-      <Col >
-      {/* <div className="d-grid gap-2"> */}
-      <br></br>
-      <Alert  variant="info">
-        Congratulations, YOU WON!
-      </Alert>
-      <Button variant="success" size="lg" disabled={state.claimRewardsDisabled || state.creatingTransaction}> Claim Reward </Button>
-
-      {/* <Button  onClick={() => onClaimRewardsTransaction(state.publicKey!.toBase58())} variant="success" size="lg" disabled={state.claimRewardsDisabled || state.creatingTransaction}> Claim Reward </Button> */}
-      {/* <Button  onClick={() => onClaimRewardsTransaction('B62qkFzjHYDXq5qnFL7Q3Z63H94vUVPprA6HVULkW8rGtowLDeRusEz')} variant="success" size="lg" disabled={state.creatingTransaction}> Claim Reward </Button> */}
-      <br></br>
-      <br></br>
-      
-      <Button  onClick={onRestartQuiz} variant="light" size="lg"> Restart Quiz </Button>
-      
-      {/* </div> */}
-      </Col>
-    </Row>
-  </Container>
-  </div>
 
   let accountDoesNotExist;
   // if (state.hasBeenSetup && !state.accountExists) {
@@ -999,7 +973,6 @@ let masterHead =
    
   
    {confettiContent}
-   {claimContent}
    {loadingSpinner}
 
    { transactionContent }
