@@ -1,5 +1,5 @@
 import '/styles/globals.css'
-// import '/styles/styles.css'
+import '/styles/styles.css'
 
 import { useEffect, useState } from "react";
 import './reactCOIServiceWorker';
@@ -609,9 +609,17 @@ export default function App() {
   let setupText = state.hasBeenSetup ? '' : 'Loading App...';
 
   let setupAnim = state.hasBeenSetup ? '' :
-    <Spinner animation="grow" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </Spinner>
+  <div>
+    <Container className='text-center'>
+      <br></br>
+      <Spinner className='text-center' animation="grow" role="status">
+      </Spinner>
+      <Row>
+        <h4  >Securing the environment before you take actions</h4>
+      </Row>
+    </Container>
+   
+  </div>
 
   let loadingSpinner = 
   <Container  className="text-center">
@@ -861,7 +869,7 @@ let loginButton =
           isMetamaskInstalled ? (
             <div>
               {/* <img src={logo} className="App-logo" alt="logo" /> */}
-              <Button onClick={connectETHWallet}>Connect to Metamask</Button>
+              <Button onClick={connectETHWallet} disabled={!state.hasBeenSetup}>Connect to Metamask</Button>
             </div>
           ) : (
             <p>Install Your Metamask wallet</p>
@@ -887,7 +895,7 @@ let loginButton =
         isAuroInstalled ? (
           <div>
             {/* <img src={logo} className="App-logo" alt="logo" /> */}
-            <Button onClick={connectMinaWallet}>Connect to Auro</Button>
+            <Button onClick={connectMinaWallet} disabled={!state.hasBeenSetup}>Connect to Auro</Button>
           </div>
         ) : (
           <p>Install Your Auro wallet</p>
@@ -933,7 +941,8 @@ let loginNav =
 let navigation = 
 <nav className="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
     <Container>
-        <a className="navbar-brand" href="#page-top"><img src="assets/img/navbar-logo.svg" alt="..." /></a>
+        {/* <a className="navbar-brand" href="#page-top"><img src="assets/img/navbar-logo.svg" alt="..." /></a> */}
+        <a className="navbar-brand" href="#page-top"></a>
         
         <div className="collapse navbar-collapse" id="navbarResponsive">
         {(MinaAccount && ETHAccount)?
@@ -948,7 +957,7 @@ let masterHead =
   <header className="masthead">
       <Container >
           <div className="masthead-subheading">Welcome To Your Private Identity Portal!</div>
-          <div className="masthead-heading text-uppercase">It's Nice To Meet You, Anon</div>
+          <div className="masthead-heading text-uppercase">Nice To Meet You, Anon</div>
           <h4>(If your real name is Anon, we promise we had no clue)</h4>
           <br></br>
           <br></br>
@@ -957,8 +966,9 @@ let masterHead =
 
           {(MinaAccount && ETHAccount && !state.loggedIn)?
           <h3>Sign Up or Log In to Access your Community</h3>:
-          <Button onClick={onConnect} variant="light" size="lg" className={state.loggedIn?"d-none":"d-block"}>Connect to Metamask & Auro to Begin</Button>
+          <Button onClick={onConnect} variant="light" size="lg" className={state.loggedIn?"d-none":"d-block"} disabled={!state.hasBeenSetup}>Connect to Metamask & Auro to Begin</Button>
           }
+
           {/* <p className="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a> */}
       </Container>
   </header>
