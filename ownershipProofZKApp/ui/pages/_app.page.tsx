@@ -595,7 +595,57 @@ export default function App() {
   //   }
     
   // };
+  //
+  // -------------------------------------------------------
+  // handle ETH account change https://stackoverflow.com/a/72106671
+  useEffect(() => {
+    (window as any).ethereum?.on("accountsChanged", handleETHAccountChange);
+    return () => {
+      (window as any).ethereum?.removeListener("accountsChanged", handleETHAccountChange);
+    };
+  });
 
+   const  handleETHAccountChange  = async (args: any[])  => {
+    console.log('ETH account change')
+    // you can console to see the args
+    // if no accounts that means we are not connected
+    if (args.length === 0) {
+      console.log("Please connect to metamask");
+      // our old data is not current connected account
+      // currentAccount account that you already fetched and assume you stored it in useState
+    } else if (args[0] !== ETHAccount?ETHAccount:null) {
+      // if account changed you should update the currentAccount so you return the updated the data
+      // assuming you have [currentAccount,setCurrentAccount]=useState
+      // however you are tracking the state currentAccount, you have to update it. in case of redux you have to dispatch update action etc
+      await setETHAccount(args[0])
+
+    }
+  };
+   // -------------------------------------------------------
+  // handle Mina account change https://stackoverflow.com/a/72106671
+  useEffect(() => {
+    (window as any).mina?.on("accountsChanged", handleMinaAccountChange);
+    return () => {
+      (window as any).mina?.removeListener("accountsChanged", handleMinaAccountChange);
+    };
+  });
+
+   const  handleMinaAccountChange  = async (args: any[])  => {
+    console.log('Mina account change')
+    // you can console to see the args
+    // if no accounts that means we are not connected
+    if (args.length === 0) {
+      console.log("Please connect to auro");
+      // our old data is not current connected account
+      // currentAccount account that you already fetched and assume you stored it in useState
+    } else if (args[0] !== MinaAccount?MinaAccount:null) {
+      // if account changed you should update the currentAccount so you return the updated the data
+      // assuming you have [currentAccount,setCurrentAccount]=useState
+      // however you are tracking the state currentAccount, you have to update it. in case of redux you have to dispatch update action etc
+      await setMinaAccount(args[0])
+      console.log(args[0])
+    }
+  };
   // -------------------------------------------------------
   // Create UI elements
 
